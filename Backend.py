@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, jsonify
 import json
+from ML.models.CollabFilter import CollabFilter, CollegeCollegeRecommender, UserUserRecommender
 from util.RestResponse import RestResponse
 
 # Defining application
@@ -8,6 +9,17 @@ app = Flask(__name__)
 
 # App configuration
 app.config['JSON_SORT_KEYS'] = False
+
+# initialize college model
+CollegeCollegeRecommender = CollegeCollegeRecommender()
+UserUserRecommender = UserUserRecommender() 
+
+def init_models():
+    
+    # TODO: populate dataframe with data from database
+
+    CollegeCollegeRecommender.clean_data().run()
+    UserUserRecommender.clean_data()
 
 
 # Api for landing page
@@ -197,3 +209,5 @@ def post_data_to_db():
 # Running application
 if __name__ == '__main__':
     app.run(debug=True) # will be disabled on production
+
+    init_models()
