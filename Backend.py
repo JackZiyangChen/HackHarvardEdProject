@@ -1,8 +1,13 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, jsonify
 import json
+from util.RestResponse import RestResponse
 
 # Defining application
 app = Flask(__name__)
+
+
+# App configuration
+app.config['JSON_SORT_KEYS'] = False
 
 
 # Api for landing page
@@ -30,52 +35,59 @@ def homepage():
 # Api for recommending colleges by id
 @app.route('/recommend/college_id')
 def recommend_college_by_id():
+    res = RestResponse(200, request, {}) # initialize rest response
+    res.populate_request(request) # populate request header
+    data = {}
+
     id = []
     count = []
     try:
         id = request.args.getlist('id')
         count = request.args.getlist('count')
         print(id, count)
-        status = 200
-        description = "Data retrieved successfully"
+        data = {}
 
     except Exception as e:
-        status = 404
-        description = str(e)
+        res.set_status(504)
 
-    return json.dumps({
-        'status': status,
-        'description': description,
-        'id': id,
-        'count': count
-    })
+    res.populate_data(data)
+    return jsonify(res.generate_response()), res.status # generate a dictionary -> json
 
 
 # Api for recommending colleges by name
 @app.route('/recommend/college_name')
 def recommend_college_by_name():
+    res = RestResponse(200, request, {})
+    res.populate_request(request)
+
     colleges = []
+    data = {}
     try:
         colleges = request.args.getlist('college')
         status = 200
         description = "Data retrieved successfully"
+        data = {
+            'status': status,
+            'description': description,
+            'colleges': colleges
+        }
+        
 
     except Exception as e:
-        status = 404
-        description = str(e)
+        res.set_status(504).populate_data({})
 
+    res.populate_data(data)
 
-    return json.dumps({
-        'status': status,
-        'description': description,
-        'colleges': colleges
-    })
+    return jsonify(res.generate_response()), res.status
 
 
 # Api for recommending colleges by user id
 @app.route('/recommend/user')
 def recommend_user():
     # Get user's location/information after OAuth
+    res = RestResponse(200, request, {})
+    res.populate_request(request)
+    data = {}
 
     try:
         userCountry = "User's country"
@@ -89,13 +101,8 @@ def recommend_user():
         userCountry = ""
         userZip = ""
 
-
-    return json.dumps({
-        'status': status,
-        'description': description,
-        'Country': userCountry,
-        'Zip Code': userZip
-    })
+    res.populate_data(data)
+    return jsonify(res.generate_response()), res.status
 
 
 # Api for recommending colleges by id
@@ -103,11 +110,19 @@ def recommend_user():
 def predict_for_user():
     # Get user's location/information after OAuth
 
+    res = RestResponse(200, request, {})
+    res.populate_request(request)
+    data = {}
+
     try:
         userId = request.args.get('user')
         collegeName = request.args.get('college')
         status = 200
-        description = "Data retrieved successfully"
+        data = {
+            'status': status,
+            'User ID': userId,
+            'College Name': collegeName
+        }
 
     except Exception as e:
         status = 404
@@ -115,14 +130,14 @@ def predict_for_user():
         userId = ""
         collegeName = ""
 
-    return json.dumps({
-        'status': status,
-        'description': description,
-        'User ID': userId,
-        'College Name': collegeName
-    })
+    res.populate_data(data)
+    res.set_status(status)
+
+
+
+    return jsonify(res.generate_response()), res.status
 
 
 # Running application
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True) # will be disabled on production
