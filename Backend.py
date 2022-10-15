@@ -138,6 +138,62 @@ def predict_for_user():
     return jsonify(res.generate_response()), res.status
 
 
+# Api for retrieving user data from DB
+@app.route('/db/get')
+def get_data_from_db():
+    # Get user's location/information after OAuth
+
+    try:
+        userId = request.args.get('user')
+        status = 200
+        description = "Data retrieved successfully"
+
+    except Exception as e:
+        status = 404
+        description = str(e)
+        userId = ""
+
+    return json.dumps({
+        'status': status,
+        'description': description,
+        'User ID': userId,
+    })
+
+
+# Api for posting user data to DB
+@app.route('/db/get', methods=['POST'])
+def post_data_to_db():
+    # Get user's location/information after OAuth
+
+    try:
+        userId = request.args.get('user')
+        username = request.args.get('username')
+        email = request.args.get('email')
+        fname = request.args.get('fname')
+        lname = request.args.get('lname')
+        status = 200
+        description = "Data retrieved successfully"
+
+    except Exception as e:
+        status = 404
+        description = str(e)
+        userId = ""
+        username = ""
+        email = ""
+        fname = ""
+        lname = ""
+
+    return json.dumps({
+        'status': status,
+        'description': description,
+        'User ID': userId,
+        'Username': username,
+        'Email': email,
+        'First Name': fname,
+        'Last Name': lname
+    })
+
+
 # Running application
 if __name__ == '__main__':
     app.run(debug=True) # will be disabled on production
