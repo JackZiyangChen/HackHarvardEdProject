@@ -77,7 +77,7 @@ CREATE TABLE CollegeRequirement(
  REFERENCES CollegeInfo(college_id)
 );
 
-CREATE TABLE temp_data(
+CREATE TABLE college_data(
  name VARCHAR(100),
  cost_of_attendance_in_state INTEGER,
  tuition_in_state INTEGER,
@@ -116,8 +116,8 @@ CREATE TABLE temp_data(
  
 );
 
-LOAD DATA LOCAL INFILE '/Users/iris/Downloads/BU/Fall 2022/HackHarvard/college_data.csv'
-INTO TABLE temp_data
+LOAD DATA LOCAL INFILE '/Users/iris/Downloads/BU/Fall 2022/HackHarvard/HackHarvardEdProject/database/college_data.csv'
+INTO TABLE college_data
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
@@ -140,4 +140,36 @@ SELECT name,
  overall_admission_rate,
  campus_size,
  most_popular_disciplines
-FROM temp_data;
+FROM college_data;
+
+CREATE TABLE us_news_data (
+ id INTEGER,
+ rankingType VARCHAR(100),
+ name VARCHAR(100),
+ urlName VARCHAR(100),
+ region VARCHAR(100),
+ fundingType VARCHAR(100),
+ ranks INTEGER,
+ location VARCHAR(100),
+ tuition INTEGER,
+ totalUndergraduate INTEGER,
+ costAfterAid INTEGER,
+ percentReceivingAid FLOAT,
+ acceptanceRate FLOAT,
+ hsGpa FLOAT,
+ engineeringRepScore FLOAT,
+ businessRepScore FLOAT,
+ computerScienceRepScore FlOAT,
+ nursingRepScore FLOAT,
+ sat25 INTEGER,
+ sat75 INTEGER,
+ act25 INTEGER,
+ act75 INTEGER
+);
+
+LOAD DATA LOCAL INFILE '/Users/iris/Downloads/BU/Fall 2022/HackHarvard/us_news_2023.csv'
+INTO TABLE us_news_data
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
