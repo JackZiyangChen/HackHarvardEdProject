@@ -1,0 +1,11 @@
+.Colleges {
+  background: linear-gradient(to right, #f6fff8, #eaf4f4);
+  height: 100vh
+}
+
+.College-List {
+  margin: 1rem 0;
+  height: 600px;
+  overflow: hidden;
+  overflow-y: auto;
+}

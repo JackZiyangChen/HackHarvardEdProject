@@ -1,33 +1,26 @@
-.Login { 
-  background: linear-gradient(to right, #6B9080,  #374B42);
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.Login-Wrapper {
+.CollegeDetail {
   background: linear-gradient(to right, #ffffff, #fafafa);
-  display: inline-flex;
+  display: flex;
   justify-content: flex-start;
   flex-direction: column;
   gap: 1rem;
   border: 2px solid #eeeeee;
-  padding: 4rem;
+  padding: 1rem;
   border-radius: 1rem;
   margin-bottom: 1rem;
+}
+
+.CollegeDetail-Spacing { 
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.Login-Input {
-  width: 200px;
-  font-size: 1rem;
-  padding: 0.25rem 0.5rem;
+.gap {
+  gap: 5px;
 }
 
-.Login-Button {
-  padding: 0.5rem 2rem;
-  margin-top: 1rem;
+.CollegeDetail-Extend-Button {
   border: none;
   border-radius: 0.5rem;
   background: linear-gradient(to right, #A4C3B2, #85AAA1);

@@ -1,0 +1,23 @@
+.Home {
+  background: linear-gradient(to right, #f6fff8, #eaf4f4);
+  height: 100vh
+}
+
+.Home-Content {
+  margin: 2rem 4rem;
+}
+
+.hero {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 1rem;
+  margin: 1rem 0;
+}
+
+.progress {
+  margin: 1rem 0;
+  height: 300px;
+  overflow: hidden;
+  overflow-y: auto;
+}
