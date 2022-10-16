@@ -1,4 +1,5 @@
 from flask import Flask, request, redirect, jsonify
+from flaskext.mysql import MySQL
 import json
 from ML.models.CollabFilter import CollabFilter, CollegeCollegeRecommender, UserUserRecommender
 from util.RestResponse import RestResponse
@@ -6,13 +7,61 @@ from util.RestResponse import RestResponse
 # Defining application
 app = Flask(__name__)
 
+# Initializing a MySQL app
+mysql = MySQL()
+mysql.init_app(app)
+
+DB_NAME = 'userCollege'
+TABLE_NAME = 'us_news_data'
+USER_TABLE_NAME = 'Users'
+USER_PROGRESS_TABLE = 'CollegeProgress'
+
+# Setting up DB
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Rubensam@17072001'
+app.config['MYSQL_DATABASE_DB'] = DB_NAME
+
+# Establishing connection
+conn = mysql.connect()
+cursor = conn.cursor()
+
+# Getting every entry in the table
+cursor.execute(f"SELECT * FROM {TABLE_NAME}")
+collegedata = cursor.fetchall()
+
+TABLE_COLUMNS = [
+    'id',
+    'ranking-type',
+    'name',
+    'urlname',
+    'region',
+    'fundingType',
+    'ranks',
+    'location',
+    'tuition',
+    'totalUndergraduate',
+    'costAfterAid',
+    'percentReceivingAid',
+    'acceptanceRate',
+    'hsGpa',
+    'engineeringRepScore',
+    'businessRepScore',
+    'computerScienceRepScore',
+    'nursingRepScore',
+    'sat25',
+    'sat75',
+    'act25',
+    'act75']
 
 # App configuration
 app.config['JSON_SORT_KEYS'] = False
 
 # initialize college model
 CollegeCollegeRecommender = CollegeCollegeRecommender()
-UserUserRecommender = UserUserRecommender() 
+UserUserRecommender = UserUserRecommender()
+
+college_list = json.load(open('College_Data_Dict.json', 'r'))
 
 def init_models():
     
@@ -72,7 +121,6 @@ def recommend_college_by_name():
     res = RestResponse(200, request, {})
     res.populate_request(request)
 
-    colleges = []
     data = {}
     try:
         colleges = request.args.getlist('college')
@@ -83,14 +131,15 @@ def recommend_college_by_name():
             'description': description,
             'colleges': colleges
         }
-        
 
     except Exception as e:
-        res.set_status(504).populate_data({})
+        data = {
+            'status': 404,
+            'description': e,
+            'colleges': {}
+        }
 
-    res.populate_data(data)
-
-    return jsonify(res.generate_response()), res.status
+    return json.dumps(data)
 
 
 # Api for recommending colleges by user id
@@ -144,32 +193,77 @@ def predict_for_user():
 
     res.populate_data(data)
     res.set_status(status)
-
-
-
     return jsonify(res.generate_response()), res.status
 
 
 # Api for retrieving user data from DB
 @app.route('/db/get')
 def get_data_from_db():
-    # Get user's location/information after OAuth
-
     try:
-        userId = request.args.get('user')
-        status = 200
-        description = "Data retrieved successfully"
+        userData = request.args.get('user')
+        users = get_user_from_db(userData)
+
+        if users:
+            status = 200
+            description = "Data retrieved successfully"
+            tasks = []
+            for u in users[1:]:
+                tasks.append({
+                    "Users ID": u[0],
+                    "College ID": u[1],
+                    "College Name": u[2],
+                    "Sent Transcript": u[3],
+                    "Main Essay": u[4],
+                    "Supplement Essay": u[5],
+                    "Recommendation Letter": u[6],
+                    "Payment": u[7],
+                    "Deadline": u[8],
+                    "Admission Type": u[9]
+                })
+
+            returnInfo = {
+                "ID": users[0][0],
+                "Username": users[0][1],
+                "Password": users[0][2],
+                "Fname": users[0][3],
+                "LName": users[0][4],
+                "Email": users[0][5],
+                "Zip": users[0][6],
+                "Major": users[0][7],
+                "Tasks": tasks
+            }
+
+        else:
+            status = 404
+            description = f"No user with name {userData}"
+            returnInfo = {}
 
     except Exception as e:
         status = 404
         description = str(e)
-        userId = ""
+        returnInfo = {}
 
-    return json.dumps({
+    return {
         'status': status,
         'description': description,
-        'User ID': userId,
-    })
+        'data': returnInfo,
+    }
+
+
+def get_user_from_db(userData):
+    query = f"SELECT * FROM {USER_TABLE_NAME} WHERE username = '{userData}';"
+    cursor.execute(query)
+    usersList = cursor.fetchall()
+
+    if usersList != ():
+        id = usersList[0][0]
+
+        user_progress_query = f"SELECT * FROM {USER_PROGRESS_TABLE} WHERE user_id = '{id}';"
+        cursor.execute(user_progress_query)
+        user_progress = cursor.fetchall()
+        usersList += user_progress
+
+    return usersList
 
 
 # Api for posting user data to DB
@@ -203,6 +297,36 @@ def post_data_to_db():
         'Email': email,
         'First Name': fname,
         'Last Name': lname
+    })
+
+
+# Api for retrieving user data from DB
+@app.route('/get/college/data')
+def get_data_by_search():
+    # Function to get college information based on information requested by user
+
+    try:
+        query = request.args.get('request')
+        data = []
+        for info in college_list:
+            values = info.values()
+            for v in values:
+                if query in str(v):
+                    data.append(info)
+                    break
+
+        status = 200
+        description = "Data retrieved successfully"
+
+    except Exception as e:
+        status = 404
+        description = str(e)
+        data = {}
+
+    return json.dumps({
+        'status': status,
+        'description': description,
+        'data': data,
     })
 
 
