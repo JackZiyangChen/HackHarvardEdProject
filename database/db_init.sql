@@ -8,9 +8,9 @@ CREATE TABLE Users(
  first_name VARCHAR(100),
  last_name VARCHAR(100),
  email VARCHAR(100),
- zip_code INTEGER,
+ zip_code VARCHAR(5),
  major VARCHAR(100),
-
+ 
  PRIMARY KEY (user_id)
 );
  
@@ -48,7 +48,9 @@ CREATE TABLE CollegeProgress(
  
  PRIMARY KEY (user_id, college_id),
  FOREIGN KEY (user_id)
- REFERENCES Users(user_id)
+ REFERENCES Users(user_id),
+ FOREIGN KEY (college_id)
+ REFERENCES CollegeInfo(college_id)
 );
 
 CREATE TABLE CollegeInfo(
