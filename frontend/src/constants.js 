@@ -1,0 +1,7 @@
+
+const PRODUCTION_API_BASE_URL = ""
+const DEVELOPMENT_API_BASE_URL = "http://localhost:5000"
+const DEBUG = true
+const API_BASE_URL = DEBUG ? DEVELOPMENT_API_BASE_URL : PRODUCTION_API_BASE_URL
+
+export default API_BASE_URL

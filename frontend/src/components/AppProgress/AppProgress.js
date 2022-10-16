@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import './AppProgress.css';
 
 const AppProgress = (props) => {
-  const navigate = useNavigate()
+
+  const navigate = useNavigate();
   return (
     <div className="AppProcess">
       <div className="AppProcess-Header">

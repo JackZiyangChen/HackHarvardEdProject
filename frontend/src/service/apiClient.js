@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL } from "../../constants.js "
+import API_BASE_URL from "../constants.js "
 
 class ApiClient {
   constructor(remoteHostUrl) {
@@ -19,7 +19,8 @@ class ApiClient {
 
     try {
       const res = await axios({ url, method, data, headers });
-      return { data: res.data, status: res.status, error: null };
+      // return { data: res.data, status: res.status, error: null };
+      return res;
     } catch (error) {
       console.error({ errorResponse: error.response });
       const message = error?.response?.data?.error?.message;
@@ -28,4 +29,4 @@ class ApiClient {
   }
 }
 
-export default new ApiClient
+export default new ApiClient(API_BASE_URL)
