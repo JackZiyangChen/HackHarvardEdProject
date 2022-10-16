@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, jsonify
 import json
 from ML.models.CollabFilter import CollabFilter, CollegeCollegeRecommender, UserUserRecommender
 from util.RestResponse import RestResponse
+from util.data import *
 
 # Defining application
 app = Flask(__name__)
@@ -11,15 +12,22 @@ app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 # initialize college model
-CollegeCollegeRecommender = CollegeCollegeRecommender()
-UserUserRecommender = UserUserRecommender() 
+ccr = CollegeCollegeRecommender()
+uur = UserUserRecommender() 
 
 def init_models():
     
-    # TODO: populate dataframe with data from database
+    # populate dataframe with data from database
+    raw = json.load(open('database/College_Data_Dict.json'))
+    arr = []
 
-    CollegeCollegeRecommender.clean_data().run()
-    UserUserRecommender.clean_data()
+    for item in raw:
+        arr.append(item)
+    ccr.populate_df(arr)
+
+    ccr.clean_data()
+    # print(ccr.df_clean.head(5))
+    uur.clean_data()
 
 
 # Api for landing page
@@ -45,6 +53,7 @@ def homepage():
 
 
 # Api for recommending colleges by id
+# not supported
 @app.route('/recommend/college_id')
 def recommend_college_by_id():
     res = RestResponse(200, request, {}) # initialize rest response
@@ -69,24 +78,28 @@ def recommend_college_by_id():
 # Api for recommending colleges by name
 @app.route('/recommend/college_name')
 def recommend_college_by_name():
+    init_models()
+    ccr.run()
     res = RestResponse(200, request, {})
     res.populate_request(request)
 
     colleges = []
     data = {}
     try:
-        colleges = request.args.getlist('college')
-        status = 200
-        description = "Data retrieved successfully"
-        data = {
-            'status': status,
-            'description': description,
-            'colleges': colleges
-        }
-        
+        if request.method == 'GET':
+            colleges = request.args.getlist('college')
+        elif request.method == 'POST':
+            colleges = request.form.getlist('college')
+        print(colleges)
+        for c in colleges:
+            i = get_index_by_attribute(ccr.df, 'name', c)
+            print(i)
+            data = dataframe_to_dict(ccr.get_similar(i))
 
     except Exception as e:
-        res.set_status(504).populate_data({})
+        print(e)
+        res.set_status(500)
+        res.custom_message = str(e)
 
     res.populate_data(data)
 
@@ -100,20 +113,40 @@ def recommend_user():
     res = RestResponse(200, request, {})
     res.populate_request(request)
     data = {}
+    user_id = 0
+    if request.method == 'GET':
+        user_id = request.args.get('user')
+    elif request.method == 'POST':
+        user_id = request.form.get('user')
 
+    
     try:
-        userCountry = "User's country"
-        userZip = "User's Zip Code"
         status = 200
-        description = "Data retrieved successfully"
+
+        #TODO: update data with user's information
+
+        uur.clean_data().run()
+
+        i = get_index_by_attribute(ccr.result, 'User-id', user_id)
+        userlist = dataframe_to_dict(ccr.get_similar(i, n=5))
+        
+
+        # query user to find their colleges
+
+        # aggregate colleges
+
+        # feedback top 5 count
+
+
+
+        
 
     except Exception as e:
-        status = 404
-        description = str(e)
-        userCountry = ""
-        userZip = ""
+        status = 504
+        res.custom_message = f'Internal Server Error: {str(e)}'
 
-    res.populate_data(data)
+
+    res.set_status(status).populate_data(data)
     return jsonify(res.generate_response()), res.status
 
 
@@ -209,5 +242,3 @@ def post_data_to_db():
 # Running application
 if __name__ == '__main__':
     app.run(debug=True) # will be disabled on production
-
-    init_models()
