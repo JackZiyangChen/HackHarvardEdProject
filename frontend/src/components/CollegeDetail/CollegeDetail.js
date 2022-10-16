@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import './CollegeDetail.css'
 
-const CollegeDetail = () => {
+const CollegeDetail = (props) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div className="CollegeDetail">
-      <h2>Harvard University</h2>
+      <h2>{props.name}</h2>
       <div className="CollegeDetail-Spacing">
-        <p>Admission: Regular Decision</p>
-        <p>Deadline: January 1, 2023</p>
+        <p>Admission: {props.admission}</p>
+        <p>Deadline: {props.deadline}</p>
       </div>
       <div className="CollegeDetail-Spacing gap">
         <p>Progression: </p>
-        <progress className="AppProgress-Bar"value="32" max="100"></progress>
+        <progress className="AppProgress-Bar"value={props.value} max="100"></progress>
       </div>
       {isExpanded ?
         <>
@@ -20,21 +20,25 @@ const CollegeDetail = () => {
             <div className="CollegeDetail-Wrapper">
               <h3>Must be Completed</h3>
               <ul>
-                <li>Supplemental Essay</li>
-                <li>Main Essay</li>
+                {props.todos ? props.todos.map((todo) => (
+                  <li>{todo}</li>
+                )) : null}
               </ul>
             </div>
             <div className="CollegeDetail-Wrapper">
               <h3>In Progress</h3>
               <ul>
-                <li>Recommendation Letter 1</li>
-                <li>Recommendation Letter 2</li>
+                {props.progresses ? props.progresses.map((progress) => (
+                  <li>{progress}</li>
+                )) : null}
               </ul>
             </div>
             <div className="CollegeDetail-Wrapper">
               <h3>Completed</h3>
               <ul>
-                <li>Transcript</li>
+                {props.completes ? props.completes.map((complete) => (
+                  <li>{complete}</li>
+                )) : null}
               </ul>
             </div>
           </div>

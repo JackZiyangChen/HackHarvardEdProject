@@ -1,20 +1,16 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home/Home';
-import Landing from './pages/Landing/Landing';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Login from './pages/Login/Login';
-import Colleges from './pages/Colleges/Colleges';
-import Essay from './pages/Essay/Essay';
+import Portal from './pages/Portal/Portal';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/home" element={<Home/>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/colleges" element={<Colleges />} />
-        <Route path="/essay" element={<Essay />} />
+        <Route path="/" exact element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path="/portal" element={<Portal />} />
       </Routes>
     </div>
   );

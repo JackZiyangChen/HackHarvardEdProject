@@ -1,0 +1,25 @@
+.SearchResult {
+  max-height: 203px;
+  width: 300px;
+  background: #ffffff;
+  border: 2px solid #eeeeee;
+  border-radius: 1em;
+  overflow: hidden;
+  overflow-y: auto;
+  list-style: none;
+  padding-left:0;
+  position: absolute;
+}
+
+.SearchResult-Cell {
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-top: 2px solid #eeeeee;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.SearchResult-Cell:first-child {
+  border: none;
+}
