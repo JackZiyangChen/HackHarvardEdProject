@@ -8,9 +8,9 @@ CREATE TABLE Users(
  first_name VARCHAR(100),
  last_name VARCHAR(100),
  email VARCHAR(100),
- zip_code INTEGER,
+ zip_code VARCHAR(5),
  major VARCHAR(100),
-
+ 
  PRIMARY KEY (user_id)
 );
  
@@ -48,7 +48,9 @@ CREATE TABLE CollegeProgress(
  
  PRIMARY KEY (user_id, college_id),
  FOREIGN KEY (user_id)
- REFERENCES Users(user_id)
+ REFERENCES Users(user_id),
+ FOREIGN KEY (college_id)
+ REFERENCES CollegeInfo(college_id)
 );
 
 CREATE TABLE CollegeInfo(
@@ -167,7 +169,8 @@ CREATE TABLE us_news_data (
  act75 INTEGER
 );
 
-LOAD DATA LOCAL INFILE '/Users/rubenthomas/Desktop/HackHarvard/backend/HackHarvardEdProject/database/us_news_2023.csv'
+
+LOAD DATA LOCAL INFILE '/Users/iris/Downloads/BU/Fall 2022/HackHarvard/us_news_2023.csv'
 INTO TABLE us_news_data
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
